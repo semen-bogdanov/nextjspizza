@@ -1,0 +1,253 @@
+generator client {
+  // обозначили, что схему каторую он будет применять для js 
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // указываем, что база данных postgresql (provider) и куда будет подключение url
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+// !
+model User {
+  id       Int       @id @default(autoincrement()) //?
+  fullName String //?
+  // phone    String @unique
+  verified DateTime?
+  email    String    @unique //?
+  password String //? 
+
+  provider   String?
+  providerId String?
+
+  cart             Cart?
+  role             UserRole          @default(USER)
+  orders           Order[]
+  // cartItems    CartItem[]
+  VerificationCode VerificationCode?
+
+  //  phoneVerified DateTime?
+  createdAt DateTime @default(now()) //? 
+  updatedAt DateTime @updatedAt //? 
+  // CartItem      CartItem[]
+
+  //CartItem CartItem[]
+  CartItem CartItem[]
+}
+
+//! размер пиццы
+//! 
+model ProductItem {
+  id        Int  @id @default(autoincrement())
+  price     Int
+  size      Int? // вопросительный знак после типа ? говорит о том, что size может быть отсутствовать (т.е. не обязательное поле)
+  pizzaType Int? // поле для размера пиццы (не обязательно) т.е. использоваться будет только в категрии цицц
+
+  product   Product    @relation(fields: [productId], references: [id]) // взять categoryId и обратится к его таблице id
+  productId Int
+  CartItem  CartItem[]
+}
+
+//! категории
+// !
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now()) // дата создания
+  updatedAt DateTime  @updatedAt // дата обновления
+}
+
+model Product {
+  id       Int     @id @default(autoincrement())
+  name     String
+  imageUrl String
+  active   Boolean @default(false)
+
+  // pizzas Pizza[]
+
+  createdAt DateTime @default(now()) // дата создания
+  updatedAt DateTime @updatedAt // дата обновления
+
+  category    Category      @relation(fields: [categoryId], references: [id]) // взять categoryId и обратится к его таблице id
+  categoryId  Int
+  ingredients Ingredient[] // 3:25:00.  У продуктов есть множество ингредиентов Many-to-Many
+  // ProductItem ProductItem[]
+  items       ProductItem[] // вариации продуктов
+
+  // Pizza   Pizza[]
+  // Order   Order? @relation(fields: [orderId], references: [id])
+  // orderId Int?
+  // Pizza   Pizza[]
+  Pizza Pizza[]
+}
+
+model Pizza {
+  id Int @id @default(autoincrement())
+
+  price    Int
+  size     Int
+  type     Int
+  carbs    Int
+  fats     Int
+  kcal     Int
+  proteins Int
+  weight   Int
+
+  ingredients Ingredient[]
+  cartItems   CartItem[]
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//!
+model Ingredient {
+  id Int @id @default(autoincrement())
+
+  name     String
+  price    Int
+  imageUrl String
+
+  product   Product[]
+  cartItems CartItem[]
+
+  createdAt DateTime @default(now())
+  // Product   Product? @relation(fields: [productId], references: [id])
+  // productId Int?
+  // Pizza     Pizza?   @relation(fields: [pizzaId], references: [id])
+  // pizzaId   Int?
+  // Pizza     Pizza?   @relation(fields: [pizzaId], references: [id])
+  // pizzaId   Int?
+  Pizza     Pizza?   @relation(fields: [pizzaId], references: [id])
+  pizzaId   Int?
+}
+
+//!
+model Cart {
+  id Int @id @default(autoincrement())
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?  @unique
+
+  token       String
+  totalAmount Int    @default(0)
+
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Order     Order[]
+}
+
+//!
+model CartItem {
+  id Int @id @default(autoincrement())
+
+  cart   Cart @relation(fields: [cartId], references: [id])
+  cartId Int
+
+  productItem   ProductItem @relation(fields: [productItemId], references: [id])
+  productItemId Int
+
+  quantity Int @default(1)
+
+  ingredients Ingredient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  // Pizza     Pizza?   @relation(fields: [pizzaId], references: [id])
+  pizzaId   Int?
+  Pizza     Pizza?   @relation(fields: [pizzaId], references: [id])
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+
+  user        User?  @relation(fields: [userId], references: [id])
+  userId      Int?
+  // cartId Int
+  // cart   Cart @relation(fields: [cartId], references: [id])
+  token       String
+  totalAmount Int
+
+  status OrderStatus
+  //status OrderStatus @default(PENDING)
+
+  paymentId String?
+  items     Json
+
+  fullName  String
+  email     String
+  phone     String
+  address   String
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  //? Product   Product[]
+  //?  Cart      Cart?     @relation(fields: [cartId], references: [id])
+  //? cartId    Int?
+
+  // Product Product[]
+  // Cart    Cart?     @relation(fields: [cartId], references: [id])
+  // cartId  Int?
+  // Product Product[]
+}
+
+// !
+model VerificationCode {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  code String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, code])
+}
+
+// 22:24:00
+// Story - библиотека react-insta-stories
+model Story {
+  id              Int    @id @default(autoincrement())
+  previewImageUrl String
+
+  items StoryItem[]
+
+  createdAt DateTime @default(now())
+}
+
+// StoryItem - библиотека react-insta-stories
+model StoryItem {
+  id Int @id @default(autoincrement())
+
+  storyId Int
+  story   Story @relation(fields: [storyId], references: [id])
+
+  sourceUrl String
+
+  createdAt DateTime @default(now())
+}
+
+// !
+enum OrderStatus {
+  PENDING
+  SUCCEEDED
+  CANCELLED
+}
+
+// !
+enum UserRole {
+  USER
+  ADMIN
+}
