@@ -1,9 +1,9 @@
 import { prisma } from '@/prisma/prisma-client';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const code = req.nextUrl.searchParams.get('code');
+    const code = request.nextUrl.searchParams.get('code');
 
     if (!code) {
       return new NextResponse('Invalid code', { status: 400 });
@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
       return new NextResponse('Invalid code', { status: 400 });
     }
 
-    //  Ключевое изменение: обязательно возвращаем NextResponse в любом случае
     await prisma.user.update({
       where: {
         id: verificationCode.userId,
@@ -27,7 +26,7 @@ export async function GET(req: NextRequest) {
       data: {
         verified: new Date(),
       },
-    }).catch(error => {
+    }).catch((error) => {
       console.error('Error updating user:', error);
       return new NextResponse('Failed to verify user', { status: 500 });
     });
@@ -36,12 +35,12 @@ export async function GET(req: NextRequest) {
       where: {
         id: verificationCode.id,
       },
-    }).catch(error => {
+    }).catch((error) => {
       console.error('Error deleting verification code:', error);
       return new NextResponse('Failed to delete verification code', { status: 500 });
     });
 
-    return NextResponse.redirect(new URL('/?verified', req.url));
+    return new NextResponse(null, { status: 303, headers: { Location: '/?verified' } });
   } catch (error) {
     console.error('Error verifying user:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
