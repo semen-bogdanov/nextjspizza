@@ -11,7 +11,7 @@ export const VerificationUserTemplate: React.FC<Props> = ({ code }) => (
     </p>
 
     <p>
-      <a href={`https://nextjspizza-git-main-semenbogdanovs-projects.vercel.app/verify?code=${code}`}>Подтвердить регистрацию</a>
+      <a href={`https://nextjspizza.vercel.app/verify?code=${code}`}>Подтвердить регистрацию</a>
     </p>
   </div>
 );
