@@ -1,6 +1,6 @@
 ## Интернет магазин пицца. Next js. 
 
-nextjspizza.vercel.app
+Сайт: [nextjspizza.vercel.app]
 
 ### Фронтенд и Бэкенд (бэкенд на Next JS):
 
