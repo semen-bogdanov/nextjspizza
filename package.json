@@ -1,5 +1,6 @@
 {
 	"name": "sbogdanov-pizza",
+    "author": "Semen Bogdanov <semen-bogdanov@yandex.ru>",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
