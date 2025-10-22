@@ -25,7 +25,7 @@
 - resend
 - nextjs-toploader
 
-```bash
+консоль bash
 npm run dev
 # or
 yarn dev
