@@ -2,7 +2,7 @@
         
 [Сайт - интернет магазина](https://nextjspizza.vercel.app)     
   
-### Frontend & Backend (бэкенд на Next JS):       
+### Frontend & Backend (бэкенд на Next JS):        
 
 - Next JS ( Бог и спаситель ⚛︎)
 - Typescript (Душевное спокойствие 🙏🏻)
